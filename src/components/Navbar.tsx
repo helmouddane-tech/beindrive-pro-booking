@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -44,8 +48,8 @@ const Navbar = () => {
               {l.label}
             </a>
           ))}
-          <Button variant="gold" size="default">
-            Réserver
+          <Button variant="gold" size="default" onClick={() => navigate(user ? "/booking" : "/auth")}>
+            {user ? "Mon espace" : "Réserver"}
           </Button>
         </div>
 

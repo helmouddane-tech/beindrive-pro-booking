@@ -37,10 +37,10 @@ const HeroSection = () => {
             Accompagnement professionnel pour réussir dès la première tentative.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-reveal animate-reveal-delay-3">
-            <Button variant="hero" size="xl">
+            <Button variant="hero" size="xl" onClick={() => navigate("/booking")}>
               Réserver un créneau
             </Button>
-            <Button variant="hero-outline" size="xl">
+            <Button variant="hero-outline" size="xl" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}>
               Nos formations
             </Button>
           </div>

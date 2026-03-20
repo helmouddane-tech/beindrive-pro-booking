@@ -48,8 +48,8 @@ const Navbar = () => {
               {l.label}
             </a>
           ))}
-          <Button variant="gold" size="default">
-            Réserver
+          <Button variant="gold" size="default" onClick={() => navigate(user ? "/booking" : "/auth")}>
+            {user ? "Mon espace" : "Réserver"}
           </Button>
         </div>
 

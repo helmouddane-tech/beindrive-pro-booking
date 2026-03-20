@@ -5,6 +5,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const HeroSection = () => {
   const ref = useScrollReveal();
+  const navigate = useNavigate();
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">

@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -19,21 +19,22 @@ const Navbar = () => {
   const links = [
     { label: "Formations", href: "#services" },
     { label: "Pourquoi nous", href: "#why" },
+    { label: "Vidéos & News", href: "#media" },
     { label: "Contact", href: "#contact" },
   ];
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-[400ms] ease-in-out ${
         scrolled
-          ? "bg-charcoal/95 backdrop-blur-md shadow-xl shadow-charcoal/10 py-3"
+          ? "bg-charcoal/[0.97] backdrop-blur-[16px] shadow-xl border-b border-white/[0.07] py-3"
           : "bg-transparent py-5"
       }`}
     >
       <div className="container flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2">
-          <span className="font-display text-2xl font-bold text-primary-foreground tracking-tight">
-            Bein<span className="text-gold">Drive</span>
+        <a href="#" className="flex items-center">
+          <span className="font-display text-2xl font-[800] text-primary-foreground tracking-[-1.5px]">
+            Be<span className="text-gold">[In]</span>Drive
           </span>
         </a>
 
@@ -43,7 +44,7 @@ const Navbar = () => {
             <a
               key={l.href}
               href={l.href}
-              className="text-primary-foreground/70 hover:text-gold text-sm font-medium tracking-wide uppercase transition-colors duration-200"
+              className="text-primary-foreground/60 hover:text-gold text-[13px] font-medium tracking-wide uppercase transition-colors duration-200"
             >
               {l.label}
             </a>
@@ -64,19 +65,19 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-charcoal/98 backdrop-blur-md border-t border-primary-foreground/10 mt-2">
+        <div className="md:hidden bg-charcoal/[0.98] backdrop-blur-[16px] border-t border-white/[0.07] mt-2">
           <div className="container py-6 flex flex-col gap-4">
             {links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-primary-foreground/70 hover:text-gold text-sm font-medium tracking-wide uppercase py-2 transition-colors"
+                className="text-primary-foreground/60 hover:text-gold text-sm font-medium tracking-wide uppercase py-2 transition-colors duration-200"
               >
                 {l.label}
               </a>
             ))}
-            <Button variant="gold" size="lg" className="mt-2">
+            <Button variant="gold" size="lg" className="mt-2" onClick={() => { setMobileOpen(false); navigate(user ? "/booking" : "/auth"); }}>
               Réserver
             </Button>
           </div>

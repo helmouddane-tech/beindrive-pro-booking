@@ -8,7 +8,7 @@ import vig3 from "@/assets/vignette-3.jpg";
 import vig4 from "@/assets/vignette-4.jpg";
 import { motion } from "framer-motion";
 
-const ease = [0.16, 1, 0.3, 1];
+const ease = [0.16, 1, 0.3, 1] as const;
 
 const HeroSection = () => {
   const navigate = useNavigate();

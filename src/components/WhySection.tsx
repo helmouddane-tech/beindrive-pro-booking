@@ -1,68 +1,105 @@
 import { CheckCircle } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import whyBg from "@/assets/why-bg.jpg";
 
 const reasons = [
   { title: "Enseignant diplômé d'État", desc: "BEPECASER / Titre Pro ECSR. Pédagogie bienveillante et rigoureuse." },
   { title: "Sécurité routière au cœur", desc: "Formation conforme au REMC et au Programme National de Formation." },
-  { title: "Véhicule récent double commande", desc: "Apprentissage en toute sécurité sur un véhicule moderne et confortable." },
-  { title: "Réservation en ligne 24h/24", desc: "Réservez vos créneaux en ligne, y compris le samedi. On s'adapte à vous." },
-  { title: "94% de taux de réussite", desc: "Préparation minutieuse pour maximiser vos chances dès le premier passage." },
-  { title: "Tarifs transparents", desc: "Pas de frais cachés. Forfaits clairs et adaptés à votre budget." },
+  { title: "Véhicule récent double commande", desc: "Apprentissage sécurisé sur un véhicule moderne et confortable." },
+  { title: "Réservation en ligne 24h/24", desc: "Réservez vos créneaux quand vous voulez. On s'adapte à vous." },
+  { title: "94% de taux de réussite", desc: "Préparation minutieuse pour maximiser vos chances au premier passage." },
+  { title: "Tarifs transparents", desc: "Pas de frais cachés. Forfaits clairs adaptés à votre budget." },
 ];
 
+const ease = [0.16, 1, 0.3, 1] as const;
+
 const WhySection = () => {
-  const ref = useScrollReveal();
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="why" className="relative py-24 lg:py-32 bg-charcoal-light text-primary-foreground overflow-hidden">
+    <section id="why" className="relative py-28 lg:py-36 bg-charcoal text-primary-foreground overflow-hidden grain">
       {/* Photo right */}
-      <div className="absolute top-0 right-0 w-[38%] h-full hidden lg:block">
-        <img src={whyBg} alt="Conduite de nuit" className="w-full h-full object-cover" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal-light via-charcoal-light/80 to-transparent" />
+      <div className="absolute top-0 right-0 w-[42%] h-full hidden lg:block">
+        <motion.img
+          src={whyBg}
+          alt="Conduite de nuit"
+          className="w-full h-full object-cover"
+          loading="lazy"
+          initial={{ scale: 1.1 }}
+          whileInView={{ scale: 1 }}
+          transition={{ duration: 1.5, ease }}
+          viewport={{ once: true }}
+        />
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(90deg, hsl(228 30% 5%) 0%, hsl(228 30% 5% / 0.85) 30%, hsl(228 30% 5% / 0.4) 70%, transparent 100%)"
+        }} />
       </div>
 
       <div className="container relative" ref={ref}>
-        <div className="max-w-[60%] max-lg:max-w-full">
+        <div className="max-w-[55%] max-lg:max-w-full">
           {/* Eyebrow */}
-          <div className="flex items-center gap-3 mb-4 opacity-0 translate-y-5 transition-all duration-700 [.is-visible_&]:opacity-100 [.is-visible_&]:translate-y-0">
-            <div className="w-8 h-[2px] bg-gold" />
-            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-gold">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.7, ease }}
+            className="flex items-center gap-4 mb-5"
+          >
+            <div className="w-10 h-[2px] bg-gold" />
+            <span className="text-[11px] font-bold tracking-[0.25em] uppercase text-gold">
               Pourquoi BeInDrive
             </span>
-          </div>
+          </motion.div>
 
-          <h2 className="font-display font-[800] text-3xl sm:text-4xl lg:text-[44px] text-primary-foreground leading-tight tracking-[-1.5px] text-balance mb-5 opacity-0 translate-y-5 transition-all duration-700 delay-100 [.is-visible_&]:opacity-100 [.is-visible_&]:translate-y-0">
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1, duration: 0.8, ease }}
+            className="font-display font-[800] text-3xl sm:text-4xl lg:text-[48px] text-primary-foreground leading-[1.1] tracking-[-2px] text-balance mb-6"
+          >
             L'excellence au service<br />de votre réussite
-          </h2>
+          </motion.h2>
 
-          <p className="text-primary-foreground/50 text-[15px] leading-relaxed max-w-md text-pretty mb-8 opacity-0 translate-y-5 transition-all duration-700 delay-150 [.is-visible_&]:opacity-100 [.is-visible_&]:translate-y-0">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2, duration: 0.7, ease }}
+            className="text-primary-foreground/40 text-[15px] leading-[1.7] max-w-md text-pretty mb-10"
+          >
             Chaque élève est unique. Notre approche pédagogique s'adapte à votre profil
             pour vous mener au permis avec confiance et sérénité.
-          </p>
+          </motion.p>
 
           {/* Quote */}
-          <blockquote className="border-l-[3px] border-gold pl-6 mb-10 opacity-0 translate-y-5 transition-all duration-700 delay-200 [.is-visible_&]:opacity-100 [.is-visible_&]:translate-y-0">
-            <p className="font-display italic text-primary-foreground/70 text-lg leading-relaxed">
+          <motion.blockquote
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.3, duration: 0.7, ease }}
+            className="border-l-[3px] border-gold pl-7 mb-12"
+          >
+            <p className="font-display italic text-primary-foreground/60 text-lg leading-relaxed">
               "Apprendre à conduire, c'est apprendre à partager la route responsablement."
             </p>
-            <cite className="not-italic text-gold text-sm mt-2 block">— L'équipe BeInDrive</cite>
-          </blockquote>
+            <cite className="not-italic text-gold text-sm mt-3 block font-medium">— L'équipe BeInDrive</cite>
+          </motion.blockquote>
 
           {/* Grid */}
           <div className="grid sm:grid-cols-2 gap-3">
             {reasons.map((r, i) => (
-              <div
+              <motion.div
                 key={r.title}
-                className="flex gap-3 items-start p-3.5 rounded-[10px] border border-white/[0.07] bg-white/[0.03] opacity-0 translate-y-4 transition-all duration-500 [.is-visible_&]:opacity-100 [.is-visible_&]:translate-y-0"
-                style={{ transitionDelay: `${300 + i * 80}ms` }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.4 + i * 0.08, duration: 0.6, ease }}
+                className="flex gap-3.5 items-start p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm hover:border-gold/20 hover:bg-white/[0.04] transition-all duration-300 group"
               >
-                <CheckCircle className="w-4.5 h-4.5 text-gold mt-0.5 shrink-0" />
+                <CheckCircle className="w-[18px] h-[18px] text-gold mt-0.5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
                 <div>
-                  <h3 className="font-semibold text-primary-foreground text-sm mb-0.5">{r.title}</h3>
-                  <p className="text-primary-foreground/40 text-xs leading-relaxed">{r.desc}</p>
+                  <h3 className="font-semibold text-primary-foreground text-[14px] mb-1">{r.title}</h3>
+                  <p className="text-primary-foreground/35 text-[12.5px] leading-relaxed">{r.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

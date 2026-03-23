@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 48 26% 96%;
-    --foreground: 225 34% 5%;
+    --background: 44 20% 96%;
+    --foreground: 228 30% 6%;
 
     --card: 0 0% 100%;
-    --card-foreground: 225 34% 5%;
+    --card-foreground: 228 30% 6%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 225 34% 5%;
+    --popover-foreground: 228 30% 6%;
 
-    --primary: 225 34% 5%;
+    --primary: 228 30% 6%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 48 20% 92%;
-    --secondary-foreground: 225 34% 5%;
+    --secondary: 44 16% 92%;
+    --secondary-foreground: 228 30% 6%;
 
-    --muted: 48 15% 94%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 44 12% 93%;
+    --muted-foreground: 220 8% 46%;
 
-    --accent: 42 91% 44%;
-    --accent-foreground: 225 34% 5%;
+    --accent: 38 88% 44%;
+    --accent-foreground: 228 30% 6%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 42 91% 44%;
+    --border: 220 12% 90%;
+    --input: 220 12% 90%;
+    --ring: 38 88% 44%;
 
     --radius: 0.625rem;
 
@@ -44,12 +44,12 @@
     --sidebar-ring: 217 91% 60%;
 
     /* Brand tokens */
-    --gold: 42 91% 44%;
-    --gold-light: 42 80% 58%;
-    --gold-dark: 42 95% 34%;
-    --charcoal: 225 34% 5%;
-    --charcoal-light: 0 0% 5%;
-    --warm-white: 48 26% 96%;
+    --gold: 38 88% 44%;
+    --gold-light: 38 75% 56%;
+    --gold-dark: 38 92% 34%;
+    --charcoal: 228 30% 5%;
+    --charcoal-light: 228 24% 8%;
+    --warm-white: 44 20% 96%;
 
     --font-display: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
@@ -58,33 +58,33 @@
   }
 
   .dark {
-    --background: 225 34% 5%;
+    --background: 228 30% 5%;
     --foreground: 0 0% 100%;
-    --card: 225 28% 8%;
+    --card: 228 24% 8%;
     --card-foreground: 0 0% 100%;
-    --popover: 225 28% 8%;
+    --popover: 228 24% 8%;
     --popover-foreground: 0 0% 100%;
     --primary: 0 0% 100%;
-    --primary-foreground: 225 34% 5%;
-    --secondary: 225 20% 12%;
+    --primary-foreground: 228 30% 5%;
+    --secondary: 228 18% 12%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 225 20% 12%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 42 91% 44%;
-    --accent-foreground: 225 34% 5%;
+    --muted: 228 18% 12%;
+    --muted-foreground: 220 8% 55%;
+    --accent: 38 88% 44%;
+    --accent-foreground: 228 30% 5%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 20% 15%;
-    --input: 225 20% 15%;
-    --ring: 42 91% 44%;
-    --sidebar-background: 225 34% 5%;
+    --border: 228 18% 15%;
+    --input: 228 18% 15%;
+    --ring: 38 88% 44%;
+    --sidebar-background: 228 30% 5%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 42 91% 44%;
-    --sidebar-primary-foreground: 225 34% 5%;
-    --sidebar-accent: 225 20% 12%;
+    --sidebar-primary: 38 88% 44%;
+    --sidebar-primary-foreground: 228 30% 5%;
+    --sidebar-accent: 228 18% 12%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 225 20% 15%;
-    --sidebar-ring: 42 91% 44%;
+    --sidebar-border: 228 18% 15%;
+    --sidebar-ring: 38 88% 44%;
   }
 }
 
@@ -98,11 +98,17 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     overflow-wrap: break-word;
+  }
+
+  ::selection {
+    background: hsl(38 88% 44% / 0.3);
+    color: hsl(228 30% 6%);
   }
 }
 
@@ -115,7 +121,33 @@
   }
 }
 
-/* Scroll reveal animation */
+/* Grain texture overlay */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(228 30% 5%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(38 88% 44% / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(38 88% 44% / 0.5);
+}
+
+/* Scroll reveal (fallback for non-motion sections) */
 @keyframes reveal-up {
   from {
     opacity: 0;

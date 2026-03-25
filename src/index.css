@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 44 20% 96%;
-    --foreground: 228 30% 6%;
+    --background: 40 14% 96%;
+    --foreground: 225 25% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 228 30% 6%;
+    --card-foreground: 225 25% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 228 30% 6%;
+    --popover-foreground: 225 25% 8%;
 
-    --primary: 228 30% 6%;
+    --primary: 225 25% 8%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 44 16% 92%;
-    --secondary-foreground: 228 30% 6%;
+    --secondary: 40 12% 92%;
+    --secondary-foreground: 225 25% 8%;
 
-    --muted: 44 12% 93%;
+    --muted: 40 10% 93%;
     --muted-foreground: 220 8% 46%;
 
     --accent: 38 88% 44%;
-    --accent-foreground: 228 30% 6%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -32,7 +32,7 @@
     --input: 220 12% 90%;
     --ring: 38 88% 44%;
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5% 26%;
@@ -43,47 +43,43 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217 91% 60%;
 
-    /* Brand tokens */
     --gold: 38 88% 44%;
     --gold-light: 38 75% 56%;
     --gold-dark: 38 92% 34%;
-    --charcoal: 228 30% 5%;
-    --charcoal-light: 228 24% 8%;
-    --warm-white: 44 20% 96%;
+    --charcoal: 225 25% 5%;
+    --charcoal-light: 225 20% 10%;
 
     --font-display: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
-
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .dark {
-    --background: 228 30% 5%;
+    --background: 225 25% 5%;
     --foreground: 0 0% 100%;
-    --card: 228 24% 8%;
+    --card: 225 20% 8%;
     --card-foreground: 0 0% 100%;
-    --popover: 228 24% 8%;
+    --popover: 225 20% 8%;
     --popover-foreground: 0 0% 100%;
     --primary: 0 0% 100%;
-    --primary-foreground: 228 30% 5%;
-    --secondary: 228 18% 12%;
+    --primary-foreground: 225 25% 5%;
+    --secondary: 225 18% 12%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 228 18% 12%;
+    --muted: 225 18% 12%;
     --muted-foreground: 220 8% 55%;
     --accent: 38 88% 44%;
-    --accent-foreground: 228 30% 5%;
+    --accent-foreground: 225 25% 5%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 100%;
-    --border: 228 18% 15%;
-    --input: 228 18% 15%;
+    --border: 225 18% 15%;
+    --input: 225 18% 15%;
     --ring: 38 88% 44%;
-    --sidebar-background: 228 30% 5%;
+    --sidebar-background: 225 25% 5%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 38 88% 44%;
-    --sidebar-primary-foreground: 228 30% 5%;
-    --sidebar-accent: 228 18% 12%;
+    --sidebar-primary-foreground: 225 25% 5%;
+    --sidebar-accent: 225 18% 12%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 228 18% 15%;
+    --sidebar-border: 225 18% 15%;
     --sidebar-ring: 38 88% 44%;
   }
 }
@@ -107,8 +103,8 @@
   }
 
   ::selection {
-    background: hsl(38 88% 44% / 0.3);
-    color: hsl(228 30% 6%);
+    background: hsl(38 88% 44% / 0.25);
+    color: hsl(225 25% 6%);
   }
 }
 
@@ -121,23 +117,12 @@
   }
 }
 
-/* Grain texture overlay */
-.grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
-}
-
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(228 30% 5%);
+  background: hsl(225 25% 5%);
 }
 ::-webkit-scrollbar-thumb {
   background: hsl(38 88% 44% / 0.3);
@@ -147,26 +132,13 @@
   background: hsl(38 88% 44% / 0.5);
 }
 
-/* Scroll reveal (fallback for non-motion sections) */
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+/* Grain texture */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
 }
-
-.animate-reveal {
-  animation: reveal-up 0.8s var(--ease-out-expo) both;
-}
-
-.animate-reveal-delay-1 { animation-delay: 100ms; }
-.animate-reveal-delay-2 { animation-delay: 200ms; }
-.animate-reveal-delay-3 { animation-delay: 300ms; }
-.animate-reveal-delay-4 { animation-delay: 400ms; }
-.animate-reveal-delay-5 { animation-delay: 500ms; }

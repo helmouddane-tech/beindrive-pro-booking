@@ -5,8 +5,6 @@ import ctaBg from "@/assets/cta-bg.jpg";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-const ease = [0.16, 1, 0.3, 1] as const;
-
 const CTASection = () => {
   const navigate = useNavigate();
   const ref = useRef(null);
@@ -19,64 +17,61 @@ const CTASection = () => {
   ];
 
   return (
-    <section ref={ref} className="relative min-h-[460px] flex items-center overflow-hidden grain">
+    <section ref={ref} className="relative min-h-[420px] flex items-center overflow-hidden grain">
       <motion.img
         src={ctaBg}
         alt="Élève au volant"
         className="absolute inset-0 w-full h-full object-cover"
         loading="lazy"
-        initial={{ scale: 1.08 }}
+        initial={{ scale: 1.05 }}
         whileInView={{ scale: 1 }}
-        transition={{ duration: 1.5, ease }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
         viewport={{ once: true }}
       />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "linear-gradient(90deg, rgba(8,10,16,0.94) 0%, rgba(8,10,16,0.8) 45%, rgba(8,10,16,0.35) 100%)",
-        }}
-      />
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(90deg, rgba(8,10,16,0.94) 0%, rgba(8,10,16,0.8) 45%, rgba(8,10,16,0.3) 100%)"
+      }} />
 
-      <div className="relative container py-24">
-        <div className="max-w-xl">
+      <div className="relative container py-20">
+        <div className="max-w-lg">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, ease }}
-            className="flex items-center gap-4 mb-5"
+            transition={{ duration: 0.6 }}
+            className="flex items-center gap-3 mb-4"
           >
-            <div className="w-10 h-[2px] bg-gold" />
-            <span className="text-[11px] font-bold tracking-[0.25em] uppercase text-gold">Passez à l'action</span>
+            <div className="w-8 h-[2px] bg-gold" />
+            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-gold">Passez à l'action</span>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1, duration: 0.8, ease }}
-            className="font-display font-[800] text-3xl sm:text-4xl lg:text-[48px] text-primary-foreground leading-[1.1] tracking-[-2px] text-balance mb-6"
+            transition={{ delay: 0.1, duration: 0.7 }}
+            className="font-display font-[800] text-3xl lg:text-[44px] text-primary-foreground leading-[1.1] tracking-[-1.5px] mb-5"
           >
             Réservez votre première<br />heure de conduite
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2, duration: 0.7, ease }}
-            className="text-primary-foreground/40 text-[15px] leading-[1.7] max-w-md text-pretty mb-9"
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-primary-foreground/35 text-sm leading-[1.8] max-w-md mb-8"
           >
-            Prenez rendez-vous en ligne en quelques clics. Nous vous recontactons
-            pour confirmer votre créneau et organiser votre évaluation de départ.
+            Prenez rendez-vous en quelques clics. Nous vous recontactons pour
+            confirmer votre créneau et organiser votre évaluation.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.3, duration: 0.7, ease }}
-            className="flex flex-col sm:flex-row gap-4 mb-10"
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="flex flex-col sm:flex-row gap-3 mb-8"
           >
             <Button variant="gold" size="xl" onClick={() => navigate("/booking")} className="group">
               Réserver un créneau
-              <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1.5" />
+              <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
             <Button
               variant="hero-outline"
@@ -90,14 +85,14 @@ const CTASection = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.5, duration: 0.7, ease }}
-            className="flex items-center gap-8"
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex items-center gap-7"
           >
             {trust.map((t) => {
               const Icon = t.icon;
               return (
-                <div key={t.label} className="flex items-center gap-2.5 text-primary-foreground/30 text-xs">
-                  <Icon className="w-4 h-4 text-gold/70" />
+                <div key={t.label} className="flex items-center gap-2 text-primary-foreground/25 text-xs">
+                  <Icon className="w-3.5 h-3.5 text-gold/60" />
                   <span className="font-medium">{t.label}</span>
                 </div>
               );

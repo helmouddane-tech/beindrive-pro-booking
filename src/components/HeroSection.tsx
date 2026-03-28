@@ -76,7 +76,7 @@ const HeroSection = () => {
               className="font-display font-[800] text-primary-foreground block leading-[0.95]"
               style={{ fontSize: "clamp(48px, 6.5vw, 84px)", letterSpacing: "-2.5px" }}
             >
-              Beindrive<span className="text-gold">.</span>
+              Be<span className="text-gold">In</span>Drive<span className="text-gold">.</span>
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: 25 }}

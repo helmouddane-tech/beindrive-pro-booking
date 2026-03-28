@@ -38,13 +38,8 @@ const Navbar = () => {
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-1.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
-            <span className="font-display font-[800] text-charcoal text-sm leading-none">B</span>
-          </div>
-          <span className="font-display text-xl font-[800] text-primary-foreground tracking-[-1px]">
-            eindrive
-          </span>
+        <a href="#" className="flex items-center group">
+          <img src={logo} alt="BeInDrive" className="h-10 w-auto object-contain" />
         </a>
 
         {/* Desktop links */}

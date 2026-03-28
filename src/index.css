@@ -49,8 +49,8 @@
     --charcoal: 225 25% 5%;
     --charcoal-light: 225 20% 10%;
 
-    --font-display: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
   }
 
   .dark {

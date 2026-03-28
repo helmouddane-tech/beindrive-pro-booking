@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail, Shield } from "lucide-react";
+import logo from "@/assets/logo-beindrive.png";
 
 const Footer = () => {
   return (
@@ -7,11 +8,8 @@ const Footer = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-1.5 mb-4">
-              <div className="w-7 h-7 rounded-md bg-gold flex items-center justify-center">
-                <span className="font-display font-[800] text-charcoal text-xs leading-none">B</span>
-              </div>
-              <span className="font-display font-[800] text-lg tracking-[-1px]">eindrive</span>
+            <div className="mb-4">
+              <img src={logo} alt="BeInDrive" className="h-9 w-auto object-contain" />
             </div>
             <p className="text-primary-foreground/30 text-sm leading-relaxed max-w-xs mb-5">
               Auto-école agréée. Formation au code et à la conduite

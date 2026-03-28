@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo-beindrive.png";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -37,13 +38,8 @@ const Navbar = () => {
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-1.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
-            <span className="font-display font-[800] text-charcoal text-sm leading-none">B</span>
-          </div>
-          <span className="font-display text-xl font-[800] text-primary-foreground tracking-[-1px]">
-            eindrive
-          </span>
+        <a href="#" className="flex items-center group">
+          <img src={logo} alt="BeInDrive" className="h-10 w-auto object-contain" />
         </a>
 
         {/* Desktop links */}

@@ -39,7 +39,7 @@ const Navbar = () => {
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center group">
-          <img src={logo} alt="BeInDrive" className="h-8 lg:h-9 w-auto object-contain" />
+          <img src={logo} alt="BeInDrive" className="h-12 lg:h-14 w-auto object-contain" />
         </a>
 
         {/* Desktop links */}

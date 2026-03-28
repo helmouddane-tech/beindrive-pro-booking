@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="mb-4">
-              <img src={logo} alt="BeInDrive" className="h-8 w-auto object-contain" />
+              <img src={logo} alt="BeInDrive" className="h-12 w-auto object-contain" />
             </div>
             <p className="text-primary-foreground/30 text-sm leading-relaxed max-w-xs mb-5">
               Auto-école agréée. Formation au code et à la conduite

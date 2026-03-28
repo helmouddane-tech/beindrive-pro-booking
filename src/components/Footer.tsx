@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail, Shield } from "lucide-react";
+import logo from "@/assets/logo-beindrive.png";
 
 const Footer = () => {
   return (

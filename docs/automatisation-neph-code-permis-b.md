@@ -2,10 +2,16 @@
 
 **Analyse d'architecture — intégration API Code'nGo! (Bureau Veritas) dans BeInDrive**
 
-> **Révision 2** — établie sur le contrat réel : `swagger-api-internet/swagger_v1.json`.
-> La révision 1 était une conception à l'aveugle (domaine bloqué par la politique réseau).
-> Les écarts entre les deux sont récapitulés en §01bis : **cinq points étaient faux**, dont
-> le délai d'annulation et la contrainte de longueur du NEPH.
+> **Révision 3.** La révision 1 était une conception à l'aveugle (domaine bloqué par la politique
+> réseau). La révision 2 l'a reprise sur le contrat réel de Code'nGo
+> (`swagger-api-internet/swagger_v1.json`) — les cinq points corrigés sont en §01bis.
+>
+> Cette révision 3 ajoute la découverte la plus importante du dossier : **Code'nGo n'est pas le seul
+> canal d'intégration.** Deux autres existent — l'**API-ANTS** (dépôt des demandes de permis, donc
+> obtention du NEPH) et l'**API Livret Numérique** (alimentation de RdvPermis, qui conditionne vos
+> droits à places d'examen pratique). Tous deux sont réservés aux éditeurs habilités. Voir **§10**,
+> et le dossier de demande d'accès dans
+> [`habilitation-ants-dossier-editeur.md`](./habilitation-ants-dossier-editeur.md).
 
 ---
 
@@ -74,7 +80,7 @@ le parcours (§03).
 
 | Besoin métier | Système autoritaire | Endpoint / voie |
 |---|---|---|
-| **Créer** un NEPH | ANTS / France Titres | ❌ Aucune API — dossier au portail pro |
+| **Déposer une demande de permis → NEPH** | ANTS / France Titres | ⚠️ **API-ANTS** — existe, accès sur habilitation éditeur (§10) |
 | **Vérifier** un NEPH auprès du ministère | Code'nGo (relais) | ✅ `GET /candidates` |
 | Créer / mettre à jour un compte candidat | Code'nGo | ✅ `PUT /candidates` (upsert) |
 | Lister les centres d'examen | Code'nGo | ✅ `GET /sites` |
@@ -85,7 +91,8 @@ le parcours (§03).
 | Convocation PDF | Code'nGo | ✅ `GET /participations/{id}/convocation` |
 | Résultats (structurés + PDF) | Code'nGo | ✅ `GET /participations/{id}/results` + `/resultdetails` |
 | Notification de résultat | Code'nGo | ✅ **Webhook** `POST /subscribe` |
-| Réserver l'examen **pratique** | RdvPermis (ANTS) | ❌ Portail pro uniquement |
+| Alimenter le **livret numérique** → ETP → droits à places d'examen | DSR / RdvPermis | ⚠️ **API Livret Numérique** — existe (§10) |
+| Réserver un créneau d'examen **pratique** | RdvPermis | ❌ Portail pro uniquement |
 | Évaluation de départ, contrat, livret | BeInDrive | ✅ Supabase |
 
 ---
@@ -482,9 +489,11 @@ d'utilisation, structurellement fragile, et cela ferait transiter des **pièces 
 tout cadre contractuel de sous-traitance RGPD. Le risque n'est pas technique, il est juridique, et il
 porte sur l'agrément de l'auto-école.
 
-La création du NEPH reste un acte administratif de l'État. Ce qu'on automatise autour d'elle —
-checklist, relances, suivi de délai, déblocage — élimine en pratique l'essentiel de la charge de
-secrétariat.
+La **délivrance** du NEPH reste un acte administratif de l'État — aucune intégration ne la
+provoquera. En revanche, **le dépôt de la demande est automatisable** par le canal habilité décrit en
+§10 : c'est la correction majeure apportée à la révision 2, qui affirmait à tort qu'aucune voie
+n'existait. À défaut d'habilitation, ce qu'on automatise autour du dépôt — checklist, relances, suivi
+de délai, déblocage — élimine déjà l'essentiel de la charge de secrétariat.
 
 ### Conformité
 
@@ -541,6 +550,112 @@ vérifiables sur `codengo-ppd` dès que les clés sont disponibles.
    réel, avant de câbler l'affichage des résultats.
 6. **Configuration du webhook** — corps attendu par `POST /subscribe` (URL de rappel, secret de
    signature, types d'événements souscriptibles) et politique de réémission en cas d'échec.
+
+---
+
+## 10. Les deux autres canaux : API-ANTS et API Livret Numérique
+
+La révision 2 posait que la création du NEPH n'était pas automatisable. **C'est inexact.** Deux
+canaux d'intégration supplémentaires existent, tous deux réservés aux éditeurs habilités et non
+documentés publiquement.
+
+### 10.1 API-ANTS — dépôt des demandes de permis
+
+**Statut : existence établie par des sources officielles.** Les réponses ministérielles aux questions
+écrites de la 15ᵉ législature (n° 3831, 6701, 11214) confirment que depuis 2017 les auto-écoles
+déposent les demandes de permis de leurs élèves en ligne **via un web service fourni par l'ANTS**, et
+que « les principaux acteurs ont la possibilité d'**adhérer à l'API-ANTS** s'ils le souhaitent, la
+démarche restant **volontaire** ». Ces mêmes réponses reconnaissent que certaines plateformes n'y ont
+pas accès malgré des volumes importants — l'accès est donc discrétionnaire, pas automatique.
+
+**Corroboration multi-éditeurs.** Au moins deux éditeurs revendiquent l'intégration :
+**AGX Informatique** annonce une « passerelle ANTS » incluse dans son logiciel, permettant de
+transférer les informations d'un élève « en un clic, sans ressaisie en ligne » ; **AutoSoft** décrit
+une API officielle ANTS avec code éditeur, IP autorisée, certificat dédié et échanges SOAP. Le fait
+que plusieurs éditeurs indépendants décrivent le même canal écarte l'hypothèse d'un argument
+commercial isolé.
+
+**Ce qui est établi vs ce qui reste une hypothèse.** Distinction importante pour le dossier de demande :
+
+| Élément | Statut |
+|---|---|
+| L'API-ANTS existe et porte ce nom | ✅ Établi — réponses ministérielles |
+| C'est un **web service** | ✅ Établi — formulation ministérielle |
+| L'adhésion est volontaire et l'accès discrétionnaire | ✅ Établi — réponses ministérielles |
+| Plusieurs éditeurs l'utilisent en production | ✅ Établi — sources éditeurs concordantes |
+| Protocole **SOAP**, **code éditeur**, **IP whitelistée**, **certificat dédié** | ⚠️ **Source éditeur unique** — plausible et conforme aux usages d'intégration B2B de l'État, mais non confirmé par une source officielle |
+| WSDL, endpoints, schémas | ❌ Non publics |
+
+**Périmètre fonctionnel attendu** (à confirmer à l'habilitation) : création d'une demande de permis,
+préremplissage, transmission électronique du dossier, suivi de statut, et **récupération du NEPH une
+fois attribué** — c'est-à-dire la fermeture complète de la boucle que le §03 traite aujourd'hui par
+saisie manuelle.
+
+**Sur la recherche du WSDL et des endpoints.** Il n'y a pas de raccourci à chercher : sur un système
+d'État protégé par certificat client et liste blanche d'IP, l'URL n'est pas le verrou — les
+identifiants le sont. La documentation technique est **remise avec l'habilitation**, elle ne se trouve
+pas en amont. La seule voie praticable est donc la demande formelle, et c'est l'objet du dossier joint.
+
+### 10.2 API Livret Numérique — l'enjeu commercial sous-estimé
+
+C'est un canal que les révisions précédentes avaient entièrement manqué, et il a un **effet direct sur
+le chiffre d'affaires**.
+
+L'API Livret Numérique fait partie du dispositif national **RdvPermis**, piloté par la **DSR**
+(Direction de la sécurité routière) — pas par l'ANTS. Elle permet de transmettre automatiquement les
+**heures de formation** réalisées par les élèves. Ces données servent à calculer les **ETP**
+(équivalents temps plein), et **les ETP déterminent l'attribution des places d'examen pratique**. Le
+calcul est exécuté automatiquement **entre le 24 et le 25 de chaque mois**.
+
+La conséquence est directe : **une auto-école qui ne remonte pas ses heures obtient moins de places
+d'examen** qu'une concurrente équivalente qui le fait. Ce n'est pas un confort, c'est une condition
+d'accès à la ressource rare du métier. Des éditeurs (Easysystème / Codes Rousseau) remontent déjà les
+heures quotidiennement dès qu'un établissement est rattaché à un compte RdvPermis.
+
+Cela reclasse la ligne du §01 : réserver un créneau d'examen pratique reste hors API, mais
+**conditionner son droit à des créneaux ne l'est pas**.
+
+### 10.3 Trois canaux, trois habilitations, un seul socle
+
+| Canal | Autorité | Objet | Habilitation |
+|---|---|---|---|
+| **Code'nGo** | Bureau Veritas | ETG (code) | Compte Partner + compte auto-école |
+| **API-ANTS** | France Titres | Dépôt de demande de permis, NEPH | Agrément éditeur (à demander) |
+| **API Livret Numérique** | DSR / RdvPermis | Heures de formation → ETP → places d'examen | Rattachement RdvPermis + accès API |
+
+Ces trois canaux partagent le même socle technique — un connecteur serveur isolé, des secrets hors du
+bundle, un journal d'audit, une réconciliation périodique. L'architecture du §06 les accueille sans
+changement de structure :
+
+```
+supabase/functions/_shared/
+  codengo/        ← implémenté sur contrat connu (§04)
+  ants/           ← client SOAP, certificat client, à écrire après habilitation
+  livret/         ← remontée quotidienne des heures vers RdvPermis
+```
+
+Point de vigilance technique : un canal **SOAP avec certificat client et IP autorisée** ne se
+satisfait pas d'une Edge Function Deno, dont l'IP de sortie n'est ni fixe ni maîtrisée. Le connecteur
+ANTS aura donc besoin d'un **hôte à IP statique** — petite instance dédiée ou passerelle sortante — ce
+qui constitue le seul écart d'infrastructure de tout le projet. À budgéter dès la demande
+d'habilitation, puisque l'IP doit être déclarée.
+
+### 10.4 Ce que cela change pour la feuille de route
+
+Le lot 0 du §08 se scinde en trois demandes **parallèles et indépendantes**, aux délais très
+différents :
+
+| Demande | Interlocuteur | Délai attendu | Effet si obtenue |
+|---|---|---|---|
+| Compte Partner + auto-école | Bureau Veritas | Semaines | Inscription au code automatisée |
+| Agrément éditeur API-ANTS | France Titres | Mois, incertain | NEPH de bout en bout, sans ressaisie |
+| Accès API Livret Numérique | DSR / RdvPermis | Inconnu | Plus de places d'examen pratique |
+
+Aucune ne bloque les lots 1 et 4, qui restent réalisables immédiatement. Mais **les trois doivent être
+lancées maintenant** : ce sont des délais administratifs, pas techniques, et ils ne se rattrapent pas.
+
+Le dossier de demande est prêt dans
+[`habilitation-ants-dossier-editeur.md`](./habilitation-ants-dossier-editeur.md).
 
 ---
 

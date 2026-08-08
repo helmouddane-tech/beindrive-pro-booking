@@ -659,6 +659,163 @@ Le dossier de demande est prêt dans
 
 ---
 
+## 11. Mode manuel, assisté, automatisé — l'automatisation n'est jamais un prérequis
+
+Exigence produit structurante : **l'ERP doit être entièrement opérable sans aucune intégration.**
+Toute étape automatisée doit avoir son équivalent manuel. L'API accélère, elle ne conditionne pas.
+
+Ce n'est pas une concession, c'est ce qui rend le produit utilisable : une école sans clé Partner, une
+école qui réserve encore par téléphone, une école dont l'élève a fait sa demande ANTS lui-même, une
+panne Code'nGo — tous ces cas doivent fonctionner.
+
+### 11.1 Trois modes, réglés par établissement
+
+Chaque canal a son propre mode, indépendamment des autres. Une école peut être automatisée sur le code
+et manuelle sur l'ANTS.
+
+| Mode | Ce que fait l'ERP | Cas d'usage |
+|---|---|---|
+| **manuel** | Saisie humaine de bout en bout. Aucun appel sortant. | Pas de clé, ou refus d'intégrer |
+| **assisté** | L'ERP prépare (fiche de dépôt, mandat, checklist) ; l'humain exécute et confirme | Flux NEPH sans habilitation ANTS |
+| **automatisé** | L'ERP appelle l'API et enregistre le retour | Clés obtenues |
+
+```sql
+CREATE TYPE public.integration_mode AS ENUM ('manuel','assiste','automatise');
+
+CREATE TABLE public.driving_schools (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name            TEXT NOT NULL,
+  agrement_number TEXT,                      -- E-XX-XXX-XXXX
+  aurige_number   TEXT,
+  ants_mode       public.integration_mode NOT NULL DEFAULT 'manuel',
+  codengo_mode    public.integration_mode NOT NULL DEFAULT 'manuel',
+  livret_mode     public.integration_mode NOT NULL DEFAULT 'manuel',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+Les écrans ne changent pas d'un mode à l'autre : **seules les affordances changent.** Là où le mode
+automatisé affiche « Réserver », le mode manuel affiche « Enregistrer une réservation déjà faite ». La
+donnée résultante est la même, sa provenance diffère.
+
+### 11.2 La règle qui compte : la provenance, et la main humaine gagne
+
+Chaque enregistrement susceptible d'être synchronisé doit porter **d'où il vient**. Sans cela, un job
+de réconciliation écrase un jour une saisie humaine — et c'est une perte de confiance qu'on ne
+récupère pas.
+
+```sql
+CREATE TYPE public.record_source AS ENUM ('api','manual','import');
+```
+
+> **Règle absolue : une valeur saisie ou corrigée par un humain n'est jamais écrasée par une
+> synchronisation.** En cas de divergence, le job journalise et alerte — il ne tranche pas.
+
+Ajouts à `code_exam_registrations` :
+
+```sql
+  source              public.record_source NOT NULL DEFAULT 'manual',
+  created_by          UUID REFERENCES auth.users(id),
+  -- Si renseigné, un humain a corrigé cette ligne : la synchro ne réécrit plus,
+  -- elle signale la divergence.
+  manual_override_at  TIMESTAMPTZ,
+  manual_override_by  UUID REFERENCES auth.users(id),
+```
+
+Et sur `student_files`, le NEPH porte sa propre provenance. Le statut `declare` (saisi, non vérifié)
+existe déjà à côté de `verifie_ministere` : c'est exactement la distinction dont le mode manuel a
+besoin.
+
+```sql
+  neph_source  public.record_source NOT NULL DEFAULT 'manual',
+```
+
+### 11.3 La machine à états accepte les transitions forcées — mais les trace
+
+En mode manuel, un admin doit pouvoir positionner un élève où il veut : l'élève arrive d'une autre
+auto-école avec son code déjà obtenu, un dossier a été déposé hors ERP, un résultat est arrivé par
+courrier avant tout webhook.
+
+Le routeur reste la voie normale, mais gagne une entrée `forceTransition()` :
+
+- les transitions manuelles autorisées sont **déclarées explicitement**, pour que la machine reste
+  cohérente — pas de saut arbitraire ;
+- toute transition forcée exige un **motif** et est journalisée avec son auteur.
+
+```sql
+CREATE TABLE public.enrollment_transitions (
+  id          BIGSERIAL PRIMARY KEY,
+  student_id  UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  from_status public.enrollment_status,
+  to_status   public.enrollment_status NOT NULL,
+  source      public.record_source NOT NULL,
+  actor_id    UUID REFERENCES auth.users(id),
+  reason      TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+Cette table est aussi ce qui rend le parcours explicable à l'élève — et défendable en cas de litige.
+
+### 11.4 Le verrou d'entrée devient conditionnel
+
+Le §04 posait : pas de réservation sans `neph_status = 'verifie_ministere'`. En mode manuel cet appel
+n'existe pas, donc le verrou devient :
+
+```
+autoriser la réservation SI
+     neph_status = 'verifie_ministere'                       (mode automatisé)
+  OU (codengo_mode = 'manuel' ET neph_status = 'declare'
+      ET confirmation explicite d'un admin)                  (mode manuel)
+```
+
+La responsabilité se déplace sur l'humain, ce qui est acceptable — mais l'ERP doit l'afficher : « NEPH
+non vérifié auprès du ministère ». Ne pas laisser croire à une garantie qui n'existe pas.
+
+### 11.5 Réconciliation : trois cas, et un piège
+
+Dès qu'un canal passe en automatisé, le rapprochement avec `GET /sessions/{id}/participations` doit
+gérer trois situations, et une seule est évidente.
+
+| Cas | Situation | Traitement |
+|---|---|---|
+| **Les deux côtés** | La ligne locale a un `codengo_participation_id` | Mise à jour du statut — **sauf si `manual_override_at` est renseigné** : alors divergence signalée |
+| **Local seulement** | Ligne sans `codengo_participation_id` (saisie manuelle) | **Ignorer.** Ne jamais supprimer ni tenter de rapprocher automatiquement |
+| **Distant seulement** | Participation existante chez Bureau Veritas, absente en local — réservée directement sur le portail | **Importer** avec `source = 'import'`, et la placer dans une file « à rapprocher » : le rattachement à un élève passe par le NEPH et doit être **confirmé par un humain** |
+
+```sql
+CREATE TABLE public.sync_divergences (
+  id           BIGSERIAL PRIMARY KEY,
+  provider     TEXT NOT NULL DEFAULT 'codengo',
+  kind         TEXT NOT NULL,   -- 'remote_only' | 'field_conflict'
+  payload      JSONB NOT NULL,
+  student_id   UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  resolved_at  TIMESTAMPTZ,
+  resolved_by  UUID REFERENCES auth.users(id),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+**Le piège.** Un admin ne doit pas pouvoir annuler localement une participation encore `CONFIRMED`
+chez Bureau Veritas : cela crée un fantôme — une place payée, occupée, invisible dans l'ERP, et
+l'élève se présente ou pas sans que personne ne le sache. Donc :
+
+- ligne **sans** `codengo_participation_id` → annulation locale libre ;
+- ligne **avec** `codengo_participation_id`, canal automatisé → l'annulation **passe par l'API** ;
+- ligne **avec** `codengo_participation_id`, canal repassé en manuel → annulation locale possible, mais
+  derrière une confirmation explicite du type « déjà annulé côté Bureau Veritas », journalisée.
+
+### 11.6 Mode dégradé : bascule automatique, jamais de blocage
+
+Si un appel échoue — clé invalide, service indisponible, `401`, timeout — l'ERP **ne bloque pas le
+secrétariat**. Il bascule l'écran concerné en saisie manuelle, avec un bandeau explicite, et pose la
+tâche de reprise. Une panne Bureau Veritas ne doit jamais empêcher d'inscrire un élève.
+
+C'est la conséquence la plus concrète de l'exigence : le chemin manuel n'est pas un pis-aller pour
+écoles retardataires, c'est **le chemin de secours de tout le monde**.
+
+---
+
 ## Sources
 
 - API Code'nGo — `https://codengo.bureauveritas.fr/api/doc/swagger-api-internet/swagger_v1.json`
